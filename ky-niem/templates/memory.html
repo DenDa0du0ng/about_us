@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ m.title }} · Kỷ niệm của tôi{% endblock %}
+{% block content %}
+<article>
+  <header class="memory-head">
+    <a class="back" href="{{ url_for('index') }}">‹ Dòng thời gian</a>
+    <time datetime="{{ m.memory_date }}">{{ m.memory_date|vdate }}</time>
+    <h1>{{ m.title }}</h1>
+    {% if m.description %}<p class="story">{{ m.description }}</p>{% endif %}
+    <p class="muted">{{ photos|length }} ảnh</p>
+    <div class="actions">
+      <label class="btn">Thêm ảnh
+        <input id="add-photos" type="file" accept="image/*" multiple hidden>
+      </label>
+      <details class="edit">
+        <summary class="btn ghost">Sửa thông tin</summary>
+        <form method="post" action="{{ url_for('edit_memory', memory_id=m.id) }}" class="stack">
+          <label>Tên kỷ niệm <input name="title" value="{{ m.title }}" required maxlength="120"></label>
+          <label>Ngày diễn ra <input type="date" name="memory_date" value="{{ m.memory_date }}" required></label>
+          <label>Câu chuyện <textarea name="description" rows="5">{{ m.description }}</textarea></label>
+          <button class="btn">Lưu thay đổi</button>
+        </form>
+      </details>
+      <form method="post" action="{{ url_for('delete_memory', memory_id=m.id) }}"
+            onsubmit="return confirm('Xóa kỷ niệm này cùng toàn bộ {{ photos|length }} ảnh? Không thể khôi phục.')">
+        <button class="btn danger">Xóa kỷ niệm</button>
+      </form>
+    </div>
+    <div id="progress" class="progress" hidden>
+      <div class="bar"><span></span></div>
+      <p class="muted" id="progress-text"></p>
+    </div>
+  </header>
+
+  {% if photos %}
+  <div class="masonry">
+    {% for p in photos %}
+      {% set cap = m.title %}{% set deletable = true %}
+      {% include "_tile.html" %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <section class="empty"><p>Kỷ niệm này chưa có ảnh. Dùng nút “Thêm ảnh” để tải lên.</p></section>
+  {% endif %}
+</article>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('add-photos').addEventListener('change', async e => {
+  const files = [...e.target.files];
+  if (!files.length) return;
+  document.getElementById('progress').hidden = false;
+  try {
+    await MemUpload.upload({{ m.id }}, files, (done, total, pct) => {
+      document.querySelector('#progress .bar span').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = `Đã tải ${done}/${total} ảnh`;
+    });
+    location.reload();
+  } catch (err) {
+    document.getElementById('progress-text').textContent = 'Tải ảnh bị lỗi, hãy thử lại.';
+  }
+});
+</script>
+{% endblock %}

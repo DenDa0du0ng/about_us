@@ -1,0 +1,10 @@
+<figure class="tile">
+  <a class="ph" href="{{ url_for('media', kind='uploads', name=p.filename) }}"
+     data-caption="{{ cap }}">
+    <img loading="lazy" src="{{ url_for('media', kind='thumbs', name=p.thumb) }}"
+         width="{{ p.width }}" height="{{ p.height }}" alt="{{ cap }}">
+  </a>
+  {% if deletable %}
+  <button type="button" class="tile-del" data-del="{{ url_for('delete_photo', photo_id=p.id) }}" aria-label="Xóa ảnh này">×</button>
+  {% endif %}
+</figure>

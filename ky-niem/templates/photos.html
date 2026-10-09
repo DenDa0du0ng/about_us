@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Tất cả ảnh · Kỷ niệm của tôi{% endblock %}
+{% block content %}
+<section class="intro">
+  <h1>Tất cả ảnh</h1>
+  <p class="muted">{{ "{:,}".format(total).replace(",", ".") }} ảnh, mới nhất ở trên cùng.</p>
+</section>
+{% if not photos %}
+<section class="empty"><p>Chưa có ảnh nào.</p><a class="btn" href="{{ url_for('new_memory') }}">Thêm kỷ niệm</a></section>
+{% else %}
+<div class="masonry">
+  {% for p in photos %}
+    {% set cap = p.title ~ ' · ' ~ (p.memory_date|vdate) %}
+    {% include "_tile.html" %}
+  {% endfor %}
+</div>
+{% if pages > 1 %}
+<nav class="pager" aria-label="Phân trang">
+  {% if page > 1 %}<a class="btn ghost" href="{{ url_for('all_photos', page=page-1) }}">Trang trước</a>{% endif %}
+  <span>Trang {{ page }} / {{ pages }}</span>
+  {% if page < pages %}<a class="btn ghost" href="{{ url_for('all_photos', page=page+1) }}">Trang sau</a>{% endif %}
+</nav>
+{% endif %}
+{% endif %}
+{% endblock %}

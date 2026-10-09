@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="intro">
+  <h1>
+    {% if stats.c %}{{ "{:,}".format(stats.c).replace(",", ".") }} bức ảnh, {{ total_memories }} kỷ niệm{% else %}Chưa có kỷ niệm nào{% endif %}
+  </h1>
+  {% if stats.c %}<p class="muted">Đang chiếm {{ stats.s|filesize }} trên máy của bạn.</p>{% endif %}
+  <form class="search" method="get">
+    <input type="search" name="q" value="{{ q }}" placeholder="Tìm theo tên hoặc nội dung kỷ niệm" aria-label="Tìm kỷ niệm">
+    <button class="btn ghost">Tìm</button>
+  </form>
+</section>
+
+{% if not years %}
+  <section class="empty">
+    {% if q %}
+      <p>Không có kỷ niệm nào khớp với “{{ q }}”.</p>
+    {% else %}
+      <p>Hãy thêm kỷ niệm đầu tiên: chọn nhiều ảnh cùng lúc, đặt tên và ngày tháng.</p>
+      <a class="btn" href="{{ url_for('new_memory') }}">Thêm kỷ niệm đầu tiên</a>
+    {% endif %}
+  </section>
+{% endif %}
+
+{% for year, items in years.items() %}
+<section class="year">
+  <h2 class="year-label">{{ year }}</h2>
+  <div class="entries">
+    {% for it in items %}
+    {% set m = it.m %}
+    <a class="entry" href="{{ url_for('memory', memory_id=m.id) }}">
+      <div class="mosaic mosaic-{{ it.thumbs|length }}">
+        {% for p in it.thumbs %}
+          <img loading="lazy" src="{{ url_for('media', kind='thumbs', name=p.thumb) }}" alt="">
+        {% else %}
+          <div class="no-photo">Chưa có ảnh</div>
+        {% endfor %}
+      </div>
+      <div class="entry-text">
+        <time datetime="{{ m.memory_date }}">{{ m.memory_date|vdate }}</time>
+        <h3>{{ m.title }}</h3>
+        {% if m.description %}<p>{{ m.description|truncate(160) }}</p>{% endif %}
+        <span class="muted">{{ m.n }} ảnh</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endfor %}
+{% endblock %}

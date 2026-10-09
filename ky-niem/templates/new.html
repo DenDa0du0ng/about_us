@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Thêm kỷ niệm · Kỷ niệm của tôi{% endblock %}
+{% block content %}
+<section class="narrow">
+  <h1>Thêm kỷ niệm</h1>
+  <form id="new-form" class="stack">
+    <label>Tên kỷ niệm
+      <input name="title" required maxlength="120" placeholder="Ví dụ: Chuyến đi Đà Lạt">
+    </label>
+    <label>Ngày diễn ra
+      <input type="date" name="memory_date" value="{{ today }}" required>
+    </label>
+    <label>Câu chuyện của kỷ niệm
+      <textarea name="description" rows="5" placeholder="Hôm đó bạn đã ở đâu, đi cùng ai, cảm thấy thế nào?"></textarea>
+    </label>
+
+    <div id="drop" class="drop" tabindex="0">
+      <input id="files" type="file" accept="image/*" multiple hidden>
+      <p><strong>Kéo thả ảnh vào đây</strong> hoặc <button type="button" class="link" id="pick">chọn từ máy</button></p>
+      <p class="muted">Chọn được hàng trăm ảnh một lần. Định dạng: JPG, PNG, GIF, WEBP, BMP.</p>
+    </div>
+    <p id="count" class="muted" aria-live="polite"></p>
+    <div id="previews" class="previews"></div>
+
+    <div id="progress" class="progress" hidden>
+      <div class="bar"><span></span></div>
+      <p class="muted" id="progress-text"></p>
+    </div>
+    <p id="msg" class="error" hidden></p>
+    <button class="btn" id="save">Lưu kỷ niệm</button>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(() => {
+  const form = document.getElementById('new-form');
+  const drop = document.getElementById('drop');
+  const input = document.getElementById('files');
+  const previews = document.getElementById('previews');
+  const count = document.getElementById('count');
+  let selected = [];
+
+  function render() {
+    previews.innerHTML = '';
+    selected.slice(0, 30).forEach(f => {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      img.onload = () => URL.revokeObjectURL(img.src);
+      img.alt = '';
+      previews.appendChild(img);
+    });
+    count.textContent = selected.length
+      ? `Đã chọn ${selected.length} ảnh` + (selected.length > 30 ? ' (hiện 30 ảnh đầu để xem trước)' : '')
+      : '';
+  }
+  function add(list) {
+    const seen = new Set(selected.map(f => f.name + f.size + f.lastModified));
+    for (const f of list) {
+      if (!f.type.startsWith('image/')) continue;
+      const key = f.name + f.size + f.lastModified;
+      if (!seen.has(key)) { selected.push(f); seen.add(key); }
+    }
+    render();
+  }
+  document.getElementById('pick').onclick = () => input.click();
+  drop.onclick = e => { if (e.target === drop) input.click(); };
+  drop.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } };
+  input.onchange = () => { add(input.files); input.value = ''; };
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => add(e.dataTransfer.files));
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = document.getElementById('msg');
+    msg.hidden = true;
+    const btn = document.getElementById('save');
+    btn.disabled = true; btn.textContent = 'Đang lưu…';
+    try {
+      const res = await fetch('/api/memories', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(Object.fromEntries(new FormData(form)))
+      });
+      if (!res.ok) throw new Error('Không tạo được kỷ niệm.');
+      const mem = await res.json();
+      if (selected.length) {
+        document.getElementById('progress').hidden = false;
+        await MemUpload.upload(mem.id, selected, (done, total, pct) => {
+          document.querySelector('#progress .bar span').style.width = pct + '%';
+          document.getElementById('progress-text').textContent = `Đã tải ${done}/${total} ảnh`;
+        });
+      }
+      location.href = mem.url;
+    } catch (err) {
+      msg.textContent = err.message || 'Có lỗi xảy ra, hãy thử lại.';
+      msg.hidden = false;
+      btn.disabled = false; btn.textContent = 'Lưu kỷ niệm';
+    }
+  });
+})();
+</script>
+{% endblock %}
