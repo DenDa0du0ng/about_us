@@ -9,6 +9,11 @@
     <meta name="theme-color" content="#f7f4ed">
     <title>Những ngày đáng nhớ — Album của chúng mình</title>
 
+    <!-- Font hỗ trợ tiếng Việt, giữ phong cách serif thanh lịch -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+
     <!-- =========================================================
          2. GIAO DIỆN (CSS)
          Muốn đổi màu, font chữ, kích thước hoặc bố cục: chỉnh ở đây.
@@ -36,6 +41,20 @@
             color: var(--color-text);
             font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
+        /* Font serif dùng thống nhất cho tiêu đề tiếng Việt, tránh dấu bị chật/lệch */
+        .brand,
+        .hero-photo::after,
+        .section-heading h2,
+        .album-heading h2,
+        .album-card-title,
+        .photo-caption,
+        .lightbox-copy h3 {
+            font-family: "Lora", Georgia, "Times New Roman", serif;
+            font-weight: 400;
+            letter-spacing: 0;
+            line-height: 1.45;
+        }
+
         button, input { font: inherit; }
         button { cursor: pointer; }
         img { display: block; max-width: 100%; }
@@ -59,7 +78,7 @@
             display: flex;
             align-items: center;
             gap: 11px;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: "Lora", Georgia, "Times New Roman", serif;
             font-size: 20px;
         }
         .brand-mark {
@@ -96,13 +115,21 @@
         }
         .hero h1 {
             margin: 17px 0;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: clamp(42px, 6vw, 72px);
+            font-family: "Lora", Georgia, "Times New Roman", serif;
+            font-size: clamp(40px, 5.6vw, 68px);
             font-weight: 400;
-            letter-spacing: -2px;
-            line-height: 1.04;
+            letter-spacing: -0.4px;
+            line-height: 1.2;
+            overflow-wrap: normal;
+            word-break: normal;
         }
-        .hero h1 em { color: var(--color-accent); font-weight: 400; }
+        .hero h1 em {
+            color: var(--color-accent);
+            font-family: "Lora", Georgia, "Times New Roman", serif;
+            font-weight: 400;
+            font-style: italic;
+            letter-spacing: 0;
+        }
         .hero-copy {
             max-width: 510px;
             color: var(--color-muted);
@@ -131,12 +158,12 @@
             bottom: 12px;
             left: 0;
             color: #6e5b4d;
-            font-family: Georgia, serif;
+            font-family: "Lora", Georgia, "Times New Roman", serif;
             font-size: 14px;
             font-style: italic;
             text-align: center;
         }
-        .sparkle { position: absolute; color: #bd9677; font-family: Georgia, serif; font-size: 30px; }
+        .sparkle { position: absolute; color: #bd9677; font-family: "Lora", Georgia, "Times New Roman", serif; font-size: 30px; }
         .sparkle-one { top: 12px; right: 24px; }
         .sparkle-two { bottom: 12px; left: 22px; }
 
@@ -150,7 +177,7 @@
         }
         .section-heading h2, .album-heading h2 {
             margin: 8px 0 0;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: "Lora", Georgia, "Times New Roman", serif;
             font-size: clamp(27px, 4vw, 35px);
             font-weight: 400;
         }
@@ -187,7 +214,7 @@
         .album-card-title {
             display: block;
             margin-bottom: 8px;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: "Lora", Georgia, "Times New Roman", serif;
             font-size: 22px;
         }
         .album-card-description {
@@ -263,7 +290,7 @@
         .photo-caption {
             display: block;
             margin-top: 7px;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: "Lora", Georgia, "Times New Roman", serif;
             font-size: 20px;
             line-height: 1.35;
         }
@@ -305,7 +332,7 @@
         .lightbox-image-wrap { display: grid; place-items: center; min-height: 300px; background: #201e1b; }
         .lightbox-image { max-width: 100%; max-height: 85vh; width: 100%; height: 100%; object-fit: contain; }
         .lightbox-copy { overflow-y: auto; padding: 35px 28px; }
-        .lightbox-copy h3 { margin: 10px 0; font-family: Georgia, serif; font-size: 28px; font-weight: 400; }
+        .lightbox-copy h3 { margin: 10px 0; font-family: "Lora", Georgia, "Times New Roman", serif; font-size: 28px; font-weight: 400; }
         .lightbox-copy p { color: var(--color-muted); font-size: 14px; line-height: 1.8; white-space: pre-wrap; }
         .close-button {
             position: absolute;
@@ -360,6 +387,16 @@
             .search-input { width: 100%; }
             .site-footer { flex-direction: column; }
         }
+        /* 2.10. Chỉnh tiêu đề để dấu tiếng Việt không bị chật/lệch */
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: clamp(36px, 9vw, 48px);
+                letter-spacing: 0;
+                line-height: 1.22;
+            }
+            .hero h1 em { letter-spacing: 0; }
+        }
+
     </style>
 </head>
 <body>
@@ -532,23 +569,65 @@
                 id: "hen-ho",
                 title: "Những buổi hẹn hò",
                 description: "Những cuộc hẹn giản dị mà chúng mình luôn nhớ.",
-                cover: "images/hen-ho/anh-bia.jpg",
+                cover: "images/hen-ho/celina/20.jpg",
                 photos: [
                     {
-                        src: "images/hen-ho/anh-01.jpg",
+                        src: "images/hen-ho/celina/24.jpg",
                         caption: "Một buổi hẹn thật vui",
-                        date: "2026-06-02",
+                        date: "2026-10-08",
                         description: "Chẳng cần điều gì cầu kỳ, chỉ cần được ở cạnh nhau là ngày hôm ấy đã đủ đáng nhớ."
                     },
                     {
-                        src: "images/hen-ho/anh-02.jpg",
+                        src: "images/hen-ho/celina/4.jpg",
                         caption: "Một góc quán quen",
-                        date: "2026-06-16",
+                        date: "2026-10-8",
                         description: "Nơi có những câu chuyện nhỏ và thời gian dường như trôi chậm hơn."
+                    },
+                    {
+                        src: "images/hen-ho/celina/1.jpg",
+                        caption: "Một góc quán quen",
+                        date: "2026-10-8",
+                        description: ""
+                    },
+                    {
+                        src: "images/hen-ho/celina/10.jpg",
+                        caption: "Một góc quán quen",
+                        date: "2026-10-8",
+                        description: ""
+                    },
+                    {
+                        src: "images/hen-ho/celina/13.jpg",
+                        caption: "Một góc quán quen",
+                        date: "2026-10-8",
+                        description: ""
+                    },
+                    {
+                        src: "images/hen-ho/celina/17.jpg",
+                        caption: "Một góc quán quen",
+                        date: "2026-10-8",
+                        description: ""
+                    },
+                    {
+                        src: "images/hen-ho/celina/19.jpg",
+                        caption: "Một góc quán quen",
+                        date: "2026-10-8",
+                        description: ""
+                    },
+                    {
+                        src: "images/hen-ho/celina/21.jpg",
+                        caption: "Một góc quán quen",
+                        date: "2026-10-8",
+                        description: ""
+                    },
+                    {
+                        src: "images/hen-ho/celina/22.jpg",
+                        caption: "Một góc quán quen",
+                        date: "2026-10-8",
+                        description: ""
                     }
                 ]
-            },
-            {
+            } /*,
+             {
                 // Album số 3
                 id: "chuyen-di",
                 title: "Những chuyến đi",
@@ -589,7 +668,7 @@
                         description: "Không chuẩn bị trước, nhưng lại là một trong những bức ảnh mình thích nhất."
                     }
                 ]
-            }
+            } */
         ];
 
         /* =======================================================
